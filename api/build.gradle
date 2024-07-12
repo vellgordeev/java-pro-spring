@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+}
+
+group 'ru.flamexander'
+version '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    sourceCompatibility = '17'
+}
+
+dependencies {
+    implementation 'org.projectlombok:lombok:1.18.22'
+}
+
+test {
+    useJUnitPlatform()
+}
