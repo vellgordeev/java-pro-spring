@@ -9,29 +9,29 @@ import ru.flamexander.java.pro.spring.entities.Account;
 import ru.flamexander.java.pro.spring.repositories.AccountsRepository;
 
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class AccountsService {
-    private static final Logger logger = LoggerFactory.getLogger(AccountsService.class.getName());
-
     private final AccountsRepository accountsRepository;
 
-    public List<Account> getAllAccounts(String clientId) {
+    private static final Logger logger = LoggerFactory.getLogger(AccountsService.class.getName());
+
+    public List<Account> getAllAccounts(Long clientId) {
         return accountsRepository.findAllByClientId(clientId);
     }
 
-    public Account getAccountById(String clientId, String id) {
-        return accountsRepository.findById(clientId, id).get();
+    public Optional<Account> getAccountById(Long clientId, Long id) {
+        return accountsRepository.findByIdAndClientId(id, clientId);
     }
 
-    public Account createNewAccount(String clientId, CreateAccountDto createAccountDto) {
+    public Account createNewAccount(Long clientId, CreateAccountDto createAccountDto) {
         if (createAccountDto.getInitialBalance() == null) {
             throw new RuntimeException("Создаваемый счет не может иметь null баланс");
         }
         Account account = new Account(clientId, createAccountDto.getInitialBalance());
-        account = accountsRepository.createNew(account);
+        account = accountsRepository.save(account);
         logger.info("Account id = {} created from {}", account.getId(), createAccountDto);
         return account;
     }
