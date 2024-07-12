@@ -4,11 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-
 @NoArgsConstructor
 @Data
-@Schema(description = "ДТО для создания нового счета")
-public class CreateAccountDto {
-    private BigDecimal initialBalance;
+@Schema(description = "ДТО результат выполнения перевода")
+public class ExecuteTransferDtoResult {
 }
