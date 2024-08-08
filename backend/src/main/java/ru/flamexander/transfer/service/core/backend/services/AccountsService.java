@@ -23,8 +23,8 @@ public class AccountsService {
         return accountsRepository.findAllByClientId(clientId);
     }
 
-    public Optional<Account> getAccountById(Long clientId, Long id) {
-        return accountsRepository.findByIdAndClientId(id, clientId);
+    public Optional<Account> findByClientIdAndAccountNumber(Long clientId, String accountNumber) {
+        return accountsRepository.findByClientIdAndAccountNumber(clientId, accountNumber);
     }
 
     public Account createNewAccount(Long clientId, CreateAccountDto createAccountDto) {

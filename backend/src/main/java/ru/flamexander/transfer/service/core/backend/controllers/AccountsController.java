@@ -30,9 +30,9 @@ public class AccountsController {
 
     private Function<Account, AccountDto> entityToDto = account -> new AccountDto(account.getId(), account.getAccountNumber(), account.getClientId(), account.getBalance());
 
-    @GetMapping("/{id}")
-    public AccountDto getAccountDetails(@RequestHeader Long clientId, @PathVariable Long id) {
-        return accountsService.getAccountById(clientId, id).map(entityToDto).orElseThrow(() -> new ResourceNotFoundException("Счет не найден"));
+    @GetMapping("/{accountNumber}")
+    public AccountDto getAccountDetails(@RequestHeader Long clientId, @PathVariable String accountNumber) {
+        return accountsService.findByClientIdAndAccountNumber(clientId, accountNumber).map(entityToDto).orElseThrow(() -> new ResourceNotFoundException("Счет не найден"));
     }
 
     @Operation(summary = "Получение информации о всех счетах пользователя")

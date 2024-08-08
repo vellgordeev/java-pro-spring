@@ -7,5 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Schema(description = "ДТО результат выполнения перевода")
-public class ExecuteTransferDtoResult {
+public class ExecuteTransferDtoResponse {
+    private String id;
+    private String status;
 }
