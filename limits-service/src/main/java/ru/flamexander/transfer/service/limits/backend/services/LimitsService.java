@@ -8,6 +8,8 @@ import ru.flamexander.transfer.service.limits.backend.entities.Limit;
 import ru.flamexander.transfer.service.limits.backend.errors.LimitServiceException;
 import ru.flamexander.transfer.service.limits.backend.repository.LimitsRepository;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
 public class LimitsService {
@@ -19,11 +21,11 @@ public class LimitsService {
         Limit limit = limitRepository.findByUserId(request.getUserId())
                 .orElseGet(() -> createDefaultLimit(request.getUserId()));
 
-        if (limit.getLimitAmount() < request.getAmount()) {
+        if (limit.getLimitAmount().compareTo(request.getAmount()) < 0) {
             throw new LimitServiceException("Insufficient limit");
         }
 
-        limit.setLimitAmount(limit.getLimitAmount() - request.getAmount());
+        limit.setLimitAmount(limit.getLimitAmount().subtract(request.getAmount()));
         limitRepository.save(limit);
 
         return new LimitResponse(limit.getUserId(), limit.getLimitAmount());
@@ -33,7 +35,7 @@ public class LimitsService {
         Limit limit = limitRepository.findByUserId(request.getUserId())
                 .orElseGet(() -> createDefaultLimit(request.getUserId()));
 
-        limit.setLimitAmount(limit.getLimitAmount() + request.getAmount());
+        limit.setLimitAmount(limit.getLimitAmount().add(request.getAmount()));
         limitRepository.save(limit);
 
         return new LimitResponse(limit.getUserId(), limit.getLimitAmount());
@@ -42,7 +44,7 @@ public class LimitsService {
     private Limit createDefaultLimit(Long userId) {
         Limit limit = new Limit();
         limit.setUserId(userId);
-        limit.setLimitAmount(limitsConfig.getDefaultLimit());
+        limit.setLimitAmount(BigDecimal.valueOf(limitsConfig.getDefaultLimit()));
         return limitRepository.save(limit);
     }
 }
