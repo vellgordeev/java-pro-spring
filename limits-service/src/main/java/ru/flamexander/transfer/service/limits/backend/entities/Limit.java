@@ -7,6 +7,8 @@ import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -17,5 +19,5 @@ public class Limit {
     private Long id;
 
     private Long userId;
-    private Integer limitAmount;
+    private BigDecimal limitAmount;
 }

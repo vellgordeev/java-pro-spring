@@ -1,4 +1,4 @@
-package ru.flamexander.transfer.service.limits.backend.dtos;
+package ru.flamexander.transfer.service.core.backend.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LimitRequest {
+public class LimitsInfoResponseDto {
     private Long userId;
-    private BigDecimal amount;
+    private BigDecimal limitAmount;
 }
