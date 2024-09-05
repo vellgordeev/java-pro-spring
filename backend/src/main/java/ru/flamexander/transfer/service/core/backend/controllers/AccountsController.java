@@ -9,7 +9,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import ru.flamexander.transfer.service.core.api.dtos.AccountDto;
 import ru.flamexander.transfer.service.core.api.dtos.AccountsPageDto;
 import ru.flamexander.transfer.service.core.api.dtos.CreateAccountDto;
@@ -30,9 +37,11 @@ public class AccountsController {
 
     private Function<Account, AccountDto> entityToDto = account -> new AccountDto(account.getId(), account.getAccountNumber(), account.getClientId(), account.getBalance());
 
-    @GetMapping("/{id}")
-    public AccountDto getAccountDetails(@RequestHeader Long clientId, @PathVariable Long id) {
-        return accountsService.getAccountById(clientId, id).map(entityToDto).orElseThrow(() -> new ResourceNotFoundException("Счет не найден"));
+    @GetMapping("/{accountNumber}")
+    public AccountDto getAccountDetails(@RequestHeader Long clientId, @PathVariable String accountNumber) {
+        return accountsService.getAccountByClientIdAndAccountNumber(clientId, accountNumber)
+                .map(entityToDto)
+                .orElseThrow(() -> new ResourceNotFoundException("Счет не найден"));
     }
 
     @Operation(summary = "Получение информации о всех счетах пользователя")

@@ -9,6 +9,7 @@ import ru.flamexander.transfer.service.core.backend.entities.Account;
 import ru.flamexander.transfer.service.core.backend.errors.AppLogicException;
 import ru.flamexander.transfer.service.core.backend.repositories.AccountsRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,8 +24,8 @@ public class AccountsService {
         return accountsRepository.findAllByClientId(clientId);
     }
 
-    public Optional<Account> getAccountById(Long clientId, Long id) {
-        return accountsRepository.findByIdAndClientId(id, clientId);
+    public Optional<Account> getAccountByClientIdAndAccountNumber(Long clientId, String accountNumber) {
+        return accountsRepository.findByClientIdAndAccountNumber(clientId, accountNumber);
     }
 
     public Account createNewAccount(Long clientId, CreateAccountDto createAccountDto) {
@@ -35,5 +36,10 @@ public class AccountsService {
         account = accountsRepository.save(account);
         logger.info("Account id = {} created from {}", account.getId(), createAccountDto);
         return account;
+    }
+
+    void updateAccountBalance(Account account, BigDecimal newBalance) {
+        account.setBalance(newBalance);
+        accountsRepository.save(account);
     }
 }
