@@ -24,7 +24,6 @@ public class TransfersServiceImpl implements TransfersService {
     private final ExecuteTransferValidator executeTransferValidator;
     private final ClientsInfoService clientsInfoService;
     private final LimitsInfoServiceIntegration limitsServiceIntegration;
-    private final AppProperties appProperties;
     private final TransfersRepository transfersRepository;
 
     @Transactional
@@ -36,14 +35,6 @@ public class TransfersServiceImpl implements TransfersService {
         if (clientsInfoService.isClientBlocker(executeTransferDtoRequest.getReceiverId())) {
             throw new AppLogicException("RECEIVER_IS_BLOCKED", "Невозможно выполнить перевод заблокированному клиенту с id = " + executeTransferDtoRequest.getReceiverId());
         }
-//        if (appProperties.getBlockedAccountsMasks().stream().anyMatch(
-//                new Predicate<String>() {
-//                    @Override
-//                    public boolean test(String s) {
-//                        return false;
-//                    }
-//                }
-//        ))
 
         Account senderAccount = accountsService.findByClientIdAndAccountNumber(clientId, executeTransferDtoRequest.getSenderAccountNumber())
                 .orElseThrow(() -> new AppLogicException("TRANSFER_SOURCE_ACCOUNT_NOT_FOUND", "Перевод невозможен, поскольку не существует счет отправителя"));
@@ -51,17 +42,17 @@ public class TransfersServiceImpl implements TransfersService {
                 .orElseThrow(() -> new AppLogicException("TRANSFER_TARGET_ACCOUNT_NOT_FOUND", "Перевод невозможен, поскольку не существует счет получателя"));
 
         LimitsInfoRequestDto limitsRequestDto = new LimitsInfoRequestDto(clientId, executeTransferDtoRequest.getTransferSum());
-        LimitsInfoResponseDto limitsResponse = limitsServiceIntegration.deductClientLimit(limitsRequestDto);
-
-        senderAccount.setBalance(senderAccount.getBalance().subtract(executeTransferDtoRequest.getTransferSum()));
-        receiverAccount.setBalance(receiverAccount.getBalance().add(executeTransferDtoRequest.getTransferSum()));
+        limitsServiceIntegration.deductClientLimit(limitsRequestDto).block();
 
         // Здесь можно добавить логику rollback, в случае ошибки при сохранении балансов
         try {
+            senderAccount.setBalance(senderAccount.getBalance().subtract(executeTransferDtoRequest.getTransferSum()));
+            receiverAccount.setBalance(receiverAccount.getBalance().add(executeTransferDtoRequest.getTransferSum()));
         } catch (Exception ex) {
-            limitsServiceIntegration.rollbackClientLimit(limitsRequestDto);
+            limitsServiceIntegration.rollbackClientLimit(limitsRequestDto).block();
             throw ex;
         }
+
         Transfer transfer = new Transfer(
                 clientId,
                 executeTransferDtoRequest.getReceiverId(),
